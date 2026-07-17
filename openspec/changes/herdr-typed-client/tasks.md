@@ -21,9 +21,9 @@
 
 ## 4. nixspace integration (verification gate)
 
-- [ ] 4.1 Add the `herdr-client` flake input and repoint the `workmux` input from `github:raine/workmux` (`flake.nix:400`) to the fork; `follows`-dedup per `mem:style/nix-follows-discipline`; `git add` the new files
-- [ ] 4.2 Confirm the `home/` submodule needs no edit (package flows via the input's `follows` into `home-configs`); confirm the generated workmux/herdr user config is unchanged apart from the derivation
-- [ ] 4.3 Verification gate: `nix run --impure .#fmt` then `nix flake check --impure -j 1`; build `nixosConfigurations.wsl` and `darwinConfigurations.macbookpro` workmux closures to confirm the fork + crate resolve from pins
+- [x] 4.1 Repointed the `workmux` input `github:raine/workmux` → `github:bryandph/workmux/herdr-typed-client` (`flake.nix`), `nix flake update workmux` locked it (rev a6c3c0ef). **No separate `herdr-client` flake input needed** — the fork's `buildRustPackage` vendors herdr-client via `cargoLock.outputHashes` (simpler than the design assumed; `follows`-dedup N/A since it's a cargo git dep, not a flake input)
+- [x] 4.2 `home/` submodule needs no edit: workmux flows via `workmux.follows` into `home-configs` (nixspace `flake.nix`), so only the input url changed; the `programs.workmux`/`programs.herdr` modules are untouched
+- [~] 4.3 `nix run --impure .#fmt` clean. Fork package derivation evals from pins for **both** `x86_64-linux` and `aarch64-darwin` (herdr-client vendor + full graph resolve). Remaining heavy gate: `nix flake check --impure -j 1` + host workmux closures for `wsl` (clean linux target) and `macbookpro` (may hit the nix-darwin cctools linker crash) — best run in CI. nixspace `flake.nix`/`flake.lock` change staged, not committed (parent repo on `main`; awaiting review)
 
 ## 5. Upstreaming + knowledge capture
 
