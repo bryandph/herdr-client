@@ -14,10 +14,10 @@
 
 ## 3. workmux fork: rewire the herdr backend
 
-- [ ] 3.1 Fork `raine/workmux` (git.bph + GitHub mirror); apply the `GregoryTomy@herdr-backend` branch; confirm it builds on current `main`
-- [ ] 3.2 Add the `herdr-client` dependency and rewire `src/multiplexer/herdr.rs` to issue typed socket calls instead of `self.run_json(&["…"])` CLI spawns, keeping the `Multiplexer` trait surface identical
-- [ ] 3.3 Fix the deferred-cleanup bug: honor `$HERDR_BIN_PATH` instead of the hardcoded `herdr` literal in `build_deferred_cleanup_script`
-- [ ] 3.4 Run the fork's own test suite (backend-detection matrix, deferred-cleanup tests); verify a live `workmux add` → herdr workspace on a host with `$HERDR_PANE_ID` set, and that `status`/`send`/`capture` work over the typed client
+- [x] 3.1 Fork base ready locally (`bryandph/workmux` branch `herdr-typed-client`): cherry-picked `GregoryTomy@herdr-backend` onto current `raine/workmux` main (v0.1.222) — clean, builds. **GitHub fork push pending owner auth** (MCP token lacks fork scope, `gh` token expired)
+- [x] 3.2 Added the `herdr-client` path dependency and rewired `src/multiplexer/herdr.rs`: `run()`/`run_json()` CLI spawns → per-op `herdr_client::Connection` (from `$HERDR_SOCKET_PATH`) with typed `request::*` params. Result-plucking unchanged (socket `result` == CLI `result`); `Multiplexer` trait surface identical; `bin` kept only for deferred/shell-hook commands
+- [x] 3.3 Fixed the deferred-cleanup bug in `src/workflow/cleanup.rs`: `${HERDR_BIN_PATH:-herdr}` shell expansion instead of the hardcoded `herdr`; test updated
+- [~] 3.4 `cargo check` + `cargo clippy` clean (rust 1.96, herdr-client path dep). Test-run (deferred-cleanup/backend-detection) + live `workmux add` → herdr workspace **deferred to the Linux Woodpecker runner**: the nix-darwin `cctools` linker traps (exit 133) linking the large workmux test binary locally — an environment bug, not a code defect
 
 ## 4. nixspace integration (verification gate)
 
