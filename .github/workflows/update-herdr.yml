@@ -28,11 +28,24 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Bump herdr · refresh schema · regenerate
+      - name: Bump herdr · refresh schema · regenerate · version
         run: |
           nix flake update herdr
           nix run .#refresh-schema
           nix develop --command ./scripts/regen.sh
+          # Track the crate version to the (new) herdr version so the Release
+          # workflow tags it on merge.
+          sys=$(nix eval --impure --raw --expr builtins.currentSystem)
+          ver=$(nix eval --raw ".#herdrVersion.$sys")
+          python3 - "$ver" <<'PY'
+          import re, sys
+          ver = sys.argv[1]
+          s = open("Cargo.toml").read()
+          s = re.sub(r'(?m)^version = "[^"]*"', f'version = "{ver}"', s, count=1)
+          open("Cargo.toml", "w").write(s)
+          print(f"crate version -> {ver}")
+          PY
+          nix develop --command cargo check --quiet
 
       - name: Open PR if the client changed
         uses: peter-evans/create-pull-request@v7

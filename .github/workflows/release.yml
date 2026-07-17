@@ -1,0 +1,44 @@
+name: Release
+
+# Cuts a GitHub Release + tag whenever the crate version is new. The crate
+# version tracks the pinned herdr version (Cargo.toml, bumped by
+# update-herdr.yml), so merging an "Update herdr" PR automatically publishes the
+# matching release. Fires on every push to main and no-ops if the version
+# already has a release.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Tag + release if the version is new
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ver=$(grep -m1 -E '^version = "' Cargo.toml | sed -E 's/version = "(.*)"/\1/')
+          tag="v$ver"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "release $tag already exists — nothing to do"
+            exit 0
+          fi
+          proto=$(grep -oE 'PROTOCOL: u32 = [0-9]+' src/generated/protocol.rs | grep -oE '[0-9]+$')
+          echo "Creating release $tag (herdr $ver, socket protocol $proto)"
+          git tag "$tag"
+          git push origin "$tag"
+          gh release create "$tag" \
+            --title "herdr-client $tag (herdr $ver · protocol $proto)" \
+            --generate-notes

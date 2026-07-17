@@ -1,5 +1,6 @@
-Implements bryan/herdr-client#1 (typed client + workmux backend rewire). The
-umbrella / upstreaming tracker is bryan/nixspace#88 (the "workmux fork track"),
+Implements bryandph/herdr-client#1 (typed client + workmux backend rewire; this
+crate is GitHub-primary). The umbrella / upstreaming tracker is bryan/nixspace#88
+(the "workmux fork track"),
 whose candidate 1 this change realizes and whose candidate 3 it records as
 dropped.
 

@@ -69,6 +69,11 @@
         };
       });
 
+    # The herdr version this client is currently generated against — drives
+    # release tagging (`nix eval --raw .#herdrVersion.<system>`). Eval-only, no
+    # herdr build required.
+    herdrVersion = forAll (pkgs: herdr.packages.${pkgs.system}.default.version);
+
     formatter = forAll (pkgs: pkgs.alejandra or pkgs.nixpkgs-fmt);
   };
 }

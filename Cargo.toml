@@ -1,6 +1,8 @@
 [package]
 name = "herdr-client"
-version = "0.1.0"
+# Tracks the herdr version this client is generated against (see the Release
+# workflow). Bumped automatically by .github/workflows/update-herdr.yml.
+version = "0.7.4"
 edition = "2021"
 rust-version = "1.74"
 license = "MIT OR Apache-2.0"
