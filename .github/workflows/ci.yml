@@ -1,0 +1,43 @@
+name: CI
+
+# herdr-client's source of truth is git.bph (bryan/herdr-client); this repo is a
+# push-mirror of it. This workflow only *validates* (build / lint / test / regen
+# drift) — it never commits, so it is safe against the mirror overwriting main.
+# The pinned toolchain comes from the flake devShell (rust + cargo-typify 0.6.2),
+# so the regen-drift check is byte-for-byte deterministic against the committed
+# generated code.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1" # weekly Mon 06:00 UTC — catch rust/dep drift over time
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: fmt · clippy · test · regen-drift
+        run: |
+          nix develop --command bash -euo pipefail -c '
+            cargo fmt --check
+            cargo clippy --all-targets -- -D warnings
+            cargo test
+            ./scripts/regen.sh
+            git diff --exit-code src/generated \
+              || { echo "::error::regen drift — src/generated is stale vs schema/herdr-api.schema.json (run scripts/regen.sh)"; exit 1; }
+          '
