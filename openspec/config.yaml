@@ -1,0 +1,64 @@
+schema: spec-driven
+# Project context shown to AI when creating OpenSpec artifacts. Keep this
+# POINTERS-NOT-VALUES: name where the source of truth lives, don't snapshot
+# drift-prone values here.
+context: |
+  ## What this repo is
+  `herdr-client` — a standalone Rust crate: a typed client for **herdr**'s
+  socket API (`ogulcancelik/herdr`, AGPL-3.0 terminal multiplexer), consumed by
+  the **workmux** herdr backend (`raine/workmux`, MIT) instead of shelling out
+  to the `herdr` CLI. Two binaries speaking herdr's documented socket protocol —
+  a deliberate license boundary (a source merge would be virally AGPL).
+
+  This repo owns the crate PLUS the design-of-record for the whole
+  workmux↔herdr typed-client integration (the workmux fork rewire and the
+  nixspace flake wiring are tracked here even though that code lands elsewhere).
+
+  Forge: Gitea `git.bph`, owner `bryan`. Repo `bryan/herdr-client`. The umbrella
+  / upstreaming tracker is `bryan/nixspace#88`; fleet delivery is nixspace's
+  `flake.nix` (a pinned flake-input repoint). Background + rationale live in the
+  nixspace serena memory `research/workmux-herdr-integration`.
+
+  ## Architecture (authoritative pointers — verify before relying)
+  - Types are `typify`-generated from herdr's PUBLISHED schema
+    (`herdr api schema --json`; bundled in herdr at
+    `docs/next/api/herdr-api.schema.json`). The schema is a container of 5
+    self-contained sub-schemas (request/success_response/error_response/event/
+    subscription_event) with zero cross-refs; a flatten transform rewrites
+    `#/schemas/<name>/$defs/X` → `#/$defs/X` per sub-schema before typify runs.
+  - Generated types are CHECKED IN (not `build.rs` codegen) and reproduced by a
+    regen script against a herdr-version-pinned schema, so downstream Nix builds
+    stay hermetic/offline and any herdr protocol change surfaces as a reviewable
+    diff or compile break. A CI check re-runs regen and fails on drift.
+  - A thin hand-written veneer sits over the generated types: socket transport
+    (`$HERDR_SOCKET_PATH`, newline-delimited JSON, response correlation by `id`,
+    protocol-version fail-loud) + typed method fns. Needed because typify
+    renders the `Request` `oneOf` as an unergonomic untagged enum.
+
+  ## Conventions an implementer MUST follow
+  - Rust: `cargo fmt` + `cargo clippy` clean before declaring done; the crate is
+    permissively licensed (MIT OR Apache-2.0) and MUST NOT vendor herdr's
+    implementation source — only schema-generated types + transport.
+  - The typify invocation is a cargo subcommand:
+    `cargo-typify typify -d PartialEq <input> -o <output>` per sub-schema.
+  - Pin the schema per herdr release; regeneration must be reproducible with no
+    diff on a clean checkout.
+
+  ## Where knowledge lives (route artifacts correctly)
+  - **Gitea issue** (`bryan/herdr-client`) = the unit of work + status.
+  - **openspec/changes/<name>/** = the spec for a change being designed/built NOW
+    (proposal links its Gitea issue; design; tasks; spec deltas). Archive on ship.
+  - **openspec/specs/** = durable capability specs.
+  - Durable decisions + rationale graduate to the nixspace serena memory
+    `research/workmux-herdr-integration` (shared corpus), not a lingering doc.
+rules:
+  proposal:
+    - 'Open by linking the Gitea issue this change implements (owner/repo#N). If none exists, say so and propose creating one first.'
+    - 'State a "Non-goals" / out-of-scope section explicitly.'
+    - 'Pointers not values — reference the file/module that holds a fact rather than pasting drift-prone current state.'
+  design:
+    - 'Record decisions AS "chose X over Y because Z"; the rationale is the durable part. After the change ships, the decision+rationale graduates to the nixspace serena memory research/workmux-herdr-integration.'
+    - 'Call out every repo the change touches (this crate, the workmux fork, nixspace) and the commit ordering between them.'
+  tasks:
+    - 'End every implementation track with a verification gate: for Rust, `cargo fmt --check` + `cargo clippy` + `cargo test`; for the nixspace wiring, `nix run --impure .#fmt` then `nix flake check --impure -j 1` plus the targeted host build.'
+    - 'Keep tasks shippable in small increments; prefer additive-then-flip over big-bang flips.'

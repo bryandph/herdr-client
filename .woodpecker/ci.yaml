@@ -1,0 +1,30 @@
+# CI for herdr-client — format, lint, test, and the regen drift gate.
+#
+# Runs on the shared bph woodpecker nix runner; the toolchain (cargo-typify,
+# rustfmt, clippy) comes from the flake devShell via `nix develop`. The drift
+# step re-runs scripts/regen.sh and fails on any diff: a herdr protocol change
+# must land as a reviewed regeneration, never a silent divergence between the
+# pinned schema and the checked-in generated types.
+#
+# NOTE: this repo must be enabled in the Woodpecker server for the pipeline to
+# fire (one-time infra step, tracked on bryan/herdr-client#1).
+labels:
+  platform: linux/amd64
+when:
+  - event: push
+  - event: pull_request
+  - event: manual
+steps:
+  check:
+    image: git.bph/bryan/woodpecker-nix-runner:latest
+    environment:
+      HOME: /root
+    commands:
+      - |
+        nix develop --impure --command bash -euc '
+          cargo fmt --check
+          cargo clippy --all-targets -- -D warnings
+          cargo test
+          ./scripts/regen.sh
+          git diff --exit-code src/generated
+        '
