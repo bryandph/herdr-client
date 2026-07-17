@@ -1,0 +1,59 @@
+name: Update herdr
+
+# Tracks new herdr releases: bump the herdr flake input, re-dump its socket
+# schema, regenerate the typed client, and open a PR if anything changed. The
+# PR is then validated by ci.yml (build/clippy/test/regen-drift) like any other.
+# A `protocol` change shows up as a schema + generated-code diff (and possibly a
+# compile break) for a human to review — never a silent runtime mismatch.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1" # weekly Mon 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-herdr
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Bump herdr · refresh schema · regenerate
+        run: |
+          nix flake update herdr
+          nix run .#refresh-schema
+          nix develop --command ./scripts/regen.sh
+
+      - name: Open PR if the client changed
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/herdr-update
+          delete-branch: true
+          title: "herdr: update pinned schema + regenerate client"
+          commit-message: |
+            herdr: bump input, refresh schema, regenerate types
+
+            Automated by .github/workflows/update-herdr.yml.
+          body: |
+            Automated update from the scheduled herdr tracker.
+
+            - Bumps the `herdr` flake input to the latest (`flake.lock`).
+            - Refreshes `schema/herdr-api.schema.json` via `herdr api schema`.
+            - Regenerates `src/generated/*` via `scripts/regen.sh`.
+
+            **Review focus:** a change to the schema's `protocol` (see
+            `src/generated/protocol.rs`) is a real wire-protocol change and may
+            need a transport/veneer follow-up. CI (`ci.yml`) validates this PR.
+          labels: |
+            automation
+            herdr
