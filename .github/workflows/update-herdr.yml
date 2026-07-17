@@ -1,10 +1,11 @@
 name: Update herdr
 
-# Tracks new herdr releases: bump the herdr flake input, re-dump its socket
-# schema, regenerate the typed client, and open a PR if anything changed. The
-# PR is then validated by ci.yml (build/clippy/test/regen-drift) like any other.
-# A `protocol` change shows up as a schema + generated-code diff (and possibly a
-# compile break) for a human to review — never a silent runtime mismatch.
+# Tracks new herdr releases end-to-end, hands-off: bump the herdr flake input,
+# re-dump its schema, regenerate the typed client, bump the crate version to the
+# new herdr version, then VALIDATE (fmt · clippy · test). Only if everything
+# passes does it commit to main and cut the matching release. If herdr is
+# unchanged the run no-ops; if validation fails, nothing lands and the run goes
+# red for a human to look at (e.g. a breaking protocol change).
 
 on:
   schedule:
@@ -13,7 +14,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: update-herdr
@@ -24,6 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
@@ -33,8 +35,7 @@ jobs:
           nix flake update herdr
           nix run .#refresh-schema
           nix develop --command ./scripts/regen.sh
-          # Track the crate version to the (new) herdr version so the Release
-          # workflow tags it on merge.
+          # Track the crate version to the (new) herdr version.
           sys=$(nix eval --impure --raw --expr builtins.currentSystem)
           ver=$(nix eval --raw ".#herdrVersion.$sys")
           python3 - "$ver" <<'PY'
@@ -46,27 +47,39 @@ jobs:
           print(f"crate version -> {ver}")
           PY
           nix develop --command cargo check --quiet
+          echo "HERDR_VER=$ver" >> "$GITHUB_ENV"
 
-      - name: Open PR if the client changed
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: automation/herdr-update
-          delete-branch: true
-          title: "herdr: update pinned schema + regenerate client"
-          commit-message: |
-            herdr: bump input, refresh schema, regenerate types
+      - name: Validate (build · clippy · test)
+        run: |
+          nix develop --command bash -euo pipefail -c '
+            cargo fmt --check
+            cargo clippy --all-targets -- -D warnings
+            cargo test
+          '
 
-            Automated by .github/workflows/update-herdr.yml.
-          body: |
-            Automated update from the scheduled herdr tracker.
-
-            - Bumps the `herdr` flake input to the latest (`flake.lock`).
-            - Refreshes `schema/herdr-api.schema.json` via `herdr api schema`.
-            - Regenerates `src/generated/*` via `scripts/regen.sh`.
-
-            **Review focus:** a change to the schema's `protocol` (see
-            `src/generated/protocol.rs`) is a real wire-protocol change and may
-            need a transport/veneer follow-up. CI (`ci.yml`) validates this PR.
-          labels: |
-            automation
-            herdr
+      - name: Commit + release (only if herdr changed and validation passed)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then
+            echo "herdr unchanged — nothing to update"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "herdr: update to ${HERDR_VER} (refresh schema, regenerate, release)"
+          git push origin HEAD:main
+          # Direct-to-main pushes by GITHUB_TOKEN don't trigger release.yml, so
+          # cut the release here (idempotent — skip if the tag already exists).
+          tag="v${HERDR_VER}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "release $tag already exists"
+            exit 0
+          fi
+          proto=$(grep -oE 'PROTOCOL: u32 = [0-9]+' src/generated/protocol.rs | grep -oE '[0-9]+$')
+          git tag "$tag"
+          git push origin "$tag"
+          gh release create "$tag" \
+            --title "herdr-client $tag (herdr ${HERDR_VER} · protocol $proto)" \
+            --generate-notes
