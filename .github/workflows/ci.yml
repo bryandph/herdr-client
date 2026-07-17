@@ -21,6 +21,7 @@ concurrency:
 
 permissions:
   contents: read
+  id-token: write # lets the Nix installer use FlakeHub cache via OIDC
 
 jobs:
   check:
