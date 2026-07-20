@@ -29,6 +29,96 @@ pub mod error {
         }
     }
 }
+#[doc = "`AgentPromptParams`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"object\","]
+#[doc = "  \"required\": ["]
+#[doc = "    \"target\","]
+#[doc = "    \"text\""]
+#[doc = "  ],"]
+#[doc = "  \"properties\": {"]
+#[doc = "    \"target\": {"]
+#[doc = "      \"type\": \"string\""]
+#[doc = "    },"]
+#[doc = "    \"text\": {"]
+#[doc = "      \"type\": \"string\""]
+#[doc = "    },"]
+#[doc = "    \"wait\": {"]
+#[doc = "      \"anyOf\": ["]
+#[doc = "        {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentPromptWaitOptions\""]
+#[doc = "        },"]
+#[doc = "        {"]
+#[doc = "          \"type\": \"null\""]
+#[doc = "        }"]
+#[doc = "      ]"]
+#[doc = "    }"]
+#[doc = "  }"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+pub struct AgentPromptParams {
+    pub target: ::std::string::String,
+    pub text: ::std::string::String,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub wait: ::std::option::Option<AgentPromptWaitOptions>,
+}
+impl AgentPromptParams {
+    pub fn builder() -> builder::AgentPromptParams {
+        Default::default()
+    }
+}
+#[doc = "`AgentPromptWaitOptions`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"object\","]
+#[doc = "  \"properties\": {"]
+#[doc = "    \"timeout_ms\": {"]
+#[doc = "      \"type\": ["]
+#[doc = "        \"integer\","]
+#[doc = "        \"null\""]
+#[doc = "      ],"]
+#[doc = "      \"format\": \"uint64\","]
+#[doc = "      \"minimum\": 0.0"]
+#[doc = "    },"]
+#[doc = "    \"until\": {"]
+#[doc = "      \"type\": \"array\","]
+#[doc = "      \"items\": {"]
+#[doc = "        \"$ref\": \"#/$defs/AgentStatus\""]
+#[doc = "      }"]
+#[doc = "    }"]
+#[doc = "  }"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+pub struct AgentPromptWaitOptions {
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub timeout_ms: ::std::option::Option<u64>,
+    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    pub until: ::std::vec::Vec<AgentStatus>,
+}
+impl ::std::default::Default for AgentPromptWaitOptions {
+    fn default() -> Self {
+        Self {
+            timeout_ms: Default::default(),
+            until: Default::default(),
+        }
+    }
+}
+impl AgentPromptWaitOptions {
+    pub fn builder() -> builder::AgentPromptWaitOptions {
+        Default::default()
+    }
+}
 #[doc = "`AgentReadParams`"]
 #[doc = r""]
 #[doc = r" <details><summary>JSON schema</summary>"]
@@ -118,7 +208,7 @@ impl AgentRenameParams {
         Default::default()
     }
 }
-#[doc = "`AgentSendParams`"]
+#[doc = "`AgentSendKeysParams`"]
 #[doc = r""]
 #[doc = r" <details><summary>JSON schema</summary>"]
 #[doc = r""]
@@ -126,14 +216,17 @@ impl AgentRenameParams {
 #[doc = "{"]
 #[doc = "  \"type\": \"object\","]
 #[doc = "  \"required\": ["]
-#[doc = "    \"target\","]
-#[doc = "    \"text\""]
+#[doc = "    \"keys\","]
+#[doc = "    \"target\""]
 #[doc = "  ],"]
 #[doc = "  \"properties\": {"]
-#[doc = "    \"target\": {"]
-#[doc = "      \"type\": \"string\""]
+#[doc = "    \"keys\": {"]
+#[doc = "      \"type\": \"array\","]
+#[doc = "      \"items\": {"]
+#[doc = "        \"type\": \"string\""]
+#[doc = "      }"]
 #[doc = "    },"]
-#[doc = "    \"text\": {"]
+#[doc = "    \"target\": {"]
 #[doc = "      \"type\": \"string\""]
 #[doc = "    }"]
 #[doc = "  }"]
@@ -141,12 +234,12 @@ impl AgentRenameParams {
 #[doc = r" ```"]
 #[doc = r" </details>"]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
-pub struct AgentSendParams {
+pub struct AgentSendKeysParams {
+    pub keys: ::std::vec::Vec<::std::string::String>,
     pub target: ::std::string::String,
-    pub text: ::std::string::String,
 }
-impl AgentSendParams {
-    pub fn builder() -> builder::AgentSendParams {
+impl AgentSendKeysParams {
+    pub fn builder() -> builder::AgentSendKeysParams {
         Default::default()
     }
 }
@@ -158,56 +251,34 @@ impl AgentSendParams {
 #[doc = "{"]
 #[doc = "  \"type\": \"object\","]
 #[doc = "  \"required\": ["]
-#[doc = "    \"argv\","]
-#[doc = "    \"name\""]
+#[doc = "    \"kind\","]
+#[doc = "    \"name\","]
+#[doc = "    \"pane_id\""]
 #[doc = "  ],"]
 #[doc = "  \"properties\": {"]
-#[doc = "    \"argv\": {"]
+#[doc = "    \"args\": {"]
 #[doc = "      \"type\": \"array\","]
 #[doc = "      \"items\": {"]
 #[doc = "        \"type\": \"string\""]
 #[doc = "      }"]
 #[doc = "    },"]
-#[doc = "    \"cwd\": {"]
-#[doc = "      \"type\": ["]
-#[doc = "        \"string\","]
-#[doc = "        \"null\""]
-#[doc = "      ]"]
-#[doc = "    },"]
-#[doc = "    \"env\": {"]
-#[doc = "      \"type\": \"object\","]
-#[doc = "      \"additionalProperties\": {"]
-#[doc = "        \"type\": \"string\""]
-#[doc = "      }"]
-#[doc = "    },"]
-#[doc = "    \"focus\": {"]
-#[doc = "      \"default\": false,"]
-#[doc = "      \"type\": \"boolean\""]
+#[doc = "    \"kind\": {"]
+#[doc = "      \"type\": \"string\""]
 #[doc = "    },"]
 #[doc = "    \"name\": {"]
 #[doc = "      \"type\": \"string\""]
 #[doc = "    },"]
-#[doc = "    \"split\": {"]
-#[doc = "      \"anyOf\": ["]
-#[doc = "        {"]
-#[doc = "          \"$ref\": \"#/$defs/SplitDirection\""]
-#[doc = "        },"]
-#[doc = "        {"]
-#[doc = "          \"type\": \"null\""]
-#[doc = "        }"]
-#[doc = "      ]"]
+#[doc = "    \"pane_id\": {"]
+#[doc = "      \"type\": \"string\""]
 #[doc = "    },"]
-#[doc = "    \"tab_id\": {"]
+#[doc = "    \"timeout_ms\": {"]
+#[doc = "      \"description\": \"Startup timeout in milliseconds. Values must be greater than 3000 and at most 300000.\","]
 #[doc = "      \"type\": ["]
-#[doc = "        \"string\","]
+#[doc = "        \"integer\","]
 #[doc = "        \"null\""]
-#[doc = "      ]"]
-#[doc = "    },"]
-#[doc = "    \"workspace_id\": {"]
-#[doc = "      \"type\": ["]
-#[doc = "        \"string\","]
-#[doc = "        \"null\""]
-#[doc = "      ]"]
+#[doc = "      ],"]
+#[doc = "      \"format\": \"uint64\","]
+#[doc = "      \"minimum\": 0.0"]
 #[doc = "    }"]
 #[doc = "  }"]
 #[doc = "}"]
@@ -215,23 +286,14 @@ impl AgentSendParams {
 #[doc = r" </details>"]
 #[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
 pub struct AgentStartParams {
-    pub argv: ::std::vec::Vec<::std::string::String>,
-    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-    pub cwd: ::std::option::Option<::std::string::String>,
-    #[serde(
-        default,
-        skip_serializing_if = ":: std :: collections :: HashMap::is_empty"
-    )]
-    pub env: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
-    #[serde(default)]
-    pub focus: bool,
+    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    pub args: ::std::vec::Vec<::std::string::String>,
+    pub kind: ::std::string::String,
     pub name: ::std::string::String,
+    pub pane_id: ::std::string::String,
+    #[doc = "Startup timeout in milliseconds. Values must be greater than 3000 and at most 300000."]
     #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-    pub split: ::std::option::Option<SplitDirection>,
-    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-    pub tab_id: ::std::option::Option<::std::string::String>,
-    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-    pub workspace_id: ::std::option::Option<::std::string::String>,
+    pub timeout_ms: ::std::option::Option<u64>,
 }
 impl AgentStartParams {
     pub fn builder() -> builder::AgentStartParams {
@@ -349,6 +411,792 @@ pub struct AgentTarget {
 }
 impl AgentTarget {
     pub fn builder() -> builder::AgentTarget {
+        Default::default()
+    }
+}
+#[doc = "`AgentViewBuiltinField`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"string\","]
+#[doc = "  \"enum\": ["]
+#[doc = "    \"status\","]
+#[doc = "    \"workspace_id\","]
+#[doc = "    \"tab_id\","]
+#[doc = "    \"pane_id\","]
+#[doc = "    \"agent\","]
+#[doc = "    \"seen\","]
+#[doc = "    \"state_change_seq\""]
+#[doc = "  ]"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(
+    :: serde :: Deserialize,
+    :: serde :: Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd,
+)]
+pub enum AgentViewBuiltinField {
+    #[serde(rename = "status")]
+    Status,
+    #[serde(rename = "workspace_id")]
+    WorkspaceId,
+    #[serde(rename = "tab_id")]
+    TabId,
+    #[serde(rename = "pane_id")]
+    PaneId,
+    #[serde(rename = "agent")]
+    Agent,
+    #[serde(rename = "seen")]
+    Seen,
+    #[serde(rename = "state_change_seq")]
+    StateChangeSeq,
+}
+impl ::std::fmt::Display for AgentViewBuiltinField {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Status => f.write_str("status"),
+            Self::WorkspaceId => f.write_str("workspace_id"),
+            Self::TabId => f.write_str("tab_id"),
+            Self::PaneId => f.write_str("pane_id"),
+            Self::Agent => f.write_str("agent"),
+            Self::Seen => f.write_str("seen"),
+            Self::StateChangeSeq => f.write_str("state_change_seq"),
+        }
+    }
+}
+impl ::std::str::FromStr for AgentViewBuiltinField {
+    type Err = self::error::ConversionError;
+    fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "status" => Ok(Self::Status),
+            "workspace_id" => Ok(Self::WorkspaceId),
+            "tab_id" => Ok(Self::TabId),
+            "pane_id" => Ok(Self::PaneId),
+            "agent" => Ok(Self::Agent),
+            "seen" => Ok(Self::Seen),
+            "state_change_seq" => Ok(Self::StateChangeSeq),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for AgentViewBuiltinField {
+    type Error = self::error::ConversionError;
+    fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<&::std::string::String> for AgentViewBuiltinField {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for AgentViewBuiltinField {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+#[doc = "`AgentViewBuiltinSortField`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"string\","]
+#[doc = "  \"enum\": ["]
+#[doc = "    \"workspace_order\","]
+#[doc = "    \"tab_order\","]
+#[doc = "    \"pane_order\","]
+#[doc = "    \"attention\","]
+#[doc = "    \"status\","]
+#[doc = "    \"agent\","]
+#[doc = "    \"seen\","]
+#[doc = "    \"state_change_seq\""]
+#[doc = "  ]"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(
+    :: serde :: Deserialize,
+    :: serde :: Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd,
+)]
+pub enum AgentViewBuiltinSortField {
+    #[serde(rename = "workspace_order")]
+    WorkspaceOrder,
+    #[serde(rename = "tab_order")]
+    TabOrder,
+    #[serde(rename = "pane_order")]
+    PaneOrder,
+    #[serde(rename = "attention")]
+    Attention,
+    #[serde(rename = "status")]
+    Status,
+    #[serde(rename = "agent")]
+    Agent,
+    #[serde(rename = "seen")]
+    Seen,
+    #[serde(rename = "state_change_seq")]
+    StateChangeSeq,
+}
+impl ::std::fmt::Display for AgentViewBuiltinSortField {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::WorkspaceOrder => f.write_str("workspace_order"),
+            Self::TabOrder => f.write_str("tab_order"),
+            Self::PaneOrder => f.write_str("pane_order"),
+            Self::Attention => f.write_str("attention"),
+            Self::Status => f.write_str("status"),
+            Self::Agent => f.write_str("agent"),
+            Self::Seen => f.write_str("seen"),
+            Self::StateChangeSeq => f.write_str("state_change_seq"),
+        }
+    }
+}
+impl ::std::str::FromStr for AgentViewBuiltinSortField {
+    type Err = self::error::ConversionError;
+    fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "workspace_order" => Ok(Self::WorkspaceOrder),
+            "tab_order" => Ok(Self::TabOrder),
+            "pane_order" => Ok(Self::PaneOrder),
+            "attention" => Ok(Self::Attention),
+            "status" => Ok(Self::Status),
+            "agent" => Ok(Self::Agent),
+            "seen" => Ok(Self::Seen),
+            "state_change_seq" => Ok(Self::StateChangeSeq),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for AgentViewBuiltinSortField {
+    type Error = self::error::ConversionError;
+    fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<&::std::string::String> for AgentViewBuiltinSortField {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for AgentViewBuiltinSortField {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+#[doc = "`AgentViewClearParams`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"object\","]
+#[doc = "  \"properties\": {"]
+#[doc = "    \"source\": {"]
+#[doc = "      \"type\": ["]
+#[doc = "        \"string\","]
+#[doc = "        \"null\""]
+#[doc = "      ]"]
+#[doc = "    }"]
+#[doc = "  }"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+pub struct AgentViewClearParams {
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub source: ::std::option::Option<::std::string::String>,
+}
+impl ::std::default::Default for AgentViewClearParams {
+    fn default() -> Self {
+        Self {
+            source: Default::default(),
+        }
+    }
+}
+impl AgentViewClearParams {
+    pub fn builder() -> builder::AgentViewClearParams {
+        Default::default()
+    }
+}
+#[doc = "`AgentViewContext`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"string\","]
+#[doc = "  \"enum\": ["]
+#[doc = "    \"current_workspace_id\","]
+#[doc = "    \"current_tab_id\""]
+#[doc = "  ]"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(
+    :: serde :: Deserialize,
+    :: serde :: Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd,
+)]
+pub enum AgentViewContext {
+    #[serde(rename = "current_workspace_id")]
+    CurrentWorkspaceId,
+    #[serde(rename = "current_tab_id")]
+    CurrentTabId,
+}
+impl ::std::fmt::Display for AgentViewContext {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::CurrentWorkspaceId => f.write_str("current_workspace_id"),
+            Self::CurrentTabId => f.write_str("current_tab_id"),
+        }
+    }
+}
+impl ::std::str::FromStr for AgentViewContext {
+    type Err = self::error::ConversionError;
+    fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "current_workspace_id" => Ok(Self::CurrentWorkspaceId),
+            "current_tab_id" => Ok(Self::CurrentTabId),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for AgentViewContext {
+    type Error = self::error::ConversionError;
+    fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<&::std::string::String> for AgentViewContext {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for AgentViewContext {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+#[doc = "`AgentViewField`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"anyOf\": ["]
+#[doc = "    {"]
+#[doc = "      \"$ref\": \"#/$defs/AgentViewBuiltinField\""]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"token\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"token\": {"]
+#[doc = "          \"type\": \"string\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    }"]
+#[doc = "  ]"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+#[serde(untagged)]
+pub enum AgentViewField {
+    AgentViewBuiltinField(AgentViewBuiltinField),
+    Object { token: ::std::string::String },
+}
+impl ::std::convert::From<AgentViewBuiltinField> for AgentViewField {
+    fn from(value: AgentViewBuiltinField) -> Self {
+        Self::AgentViewBuiltinField(value)
+    }
+}
+#[doc = "`AgentViewFilter`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"oneOf\": ["]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"filters\","]
+#[doc = "        \"op\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"filters\": {"]
+#[doc = "          \"type\": \"array\","]
+#[doc = "          \"items\": {"]
+#[doc = "            \"$ref\": \"#/$defs/AgentViewFilter\""]
+#[doc = "          }"]
+#[doc = "        },"]
+#[doc = "        \"op\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"all\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"filters\","]
+#[doc = "        \"op\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"filters\": {"]
+#[doc = "          \"type\": \"array\","]
+#[doc = "          \"items\": {"]
+#[doc = "            \"$ref\": \"#/$defs/AgentViewFilter\""]
+#[doc = "          }"]
+#[doc = "        },"]
+#[doc = "        \"op\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"any\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"filter\","]
+#[doc = "        \"op\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"filter\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentViewFilter\""]
+#[doc = "        },"]
+#[doc = "        \"op\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"not\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"field\","]
+#[doc = "        \"op\","]
+#[doc = "        \"value\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"field\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentViewField\""]
+#[doc = "        },"]
+#[doc = "        \"op\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"eq\""]
+#[doc = "        },"]
+#[doc = "        \"value\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentViewValue\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"field\","]
+#[doc = "        \"op\","]
+#[doc = "        \"values\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"field\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentViewField\""]
+#[doc = "        },"]
+#[doc = "        \"op\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"in\""]
+#[doc = "        },"]
+#[doc = "        \"values\": {"]
+#[doc = "          \"type\": \"array\","]
+#[doc = "          \"items\": {"]
+#[doc = "            \"$ref\": \"#/$defs/AgentViewValue\""]
+#[doc = "          }"]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"field\","]
+#[doc = "        \"op\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"field\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentViewField\""]
+#[doc = "        },"]
+#[doc = "        \"op\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"exists\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    }"]
+#[doc = "  ]"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+#[serde(tag = "op")]
+pub enum AgentViewFilter {
+    #[serde(rename = "all")]
+    All {
+        filters: ::std::vec::Vec<AgentViewFilter>,
+    },
+    #[serde(rename = "any")]
+    Any {
+        filters: ::std::vec::Vec<AgentViewFilter>,
+    },
+    #[serde(rename = "not")]
+    Not {
+        filter: ::std::boxed::Box<AgentViewFilter>,
+    },
+    #[serde(rename = "eq")]
+    Eq {
+        field: AgentViewField,
+        value: AgentViewValue,
+    },
+    #[serde(rename = "in")]
+    In {
+        field: AgentViewField,
+        values: ::std::vec::Vec<AgentViewValue>,
+    },
+    #[serde(rename = "exists")]
+    Exists { field: AgentViewField },
+}
+#[doc = "`AgentViewSetParams`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"object\","]
+#[doc = "  \"required\": ["]
+#[doc = "    \"source\""]
+#[doc = "  ],"]
+#[doc = "  \"properties\": {"]
+#[doc = "    \"filter\": {"]
+#[doc = "      \"anyOf\": ["]
+#[doc = "        {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentViewFilter\""]
+#[doc = "        },"]
+#[doc = "        {"]
+#[doc = "          \"type\": \"null\""]
+#[doc = "        }"]
+#[doc = "      ]"]
+#[doc = "    },"]
+#[doc = "    \"label\": {"]
+#[doc = "      \"type\": ["]
+#[doc = "        \"string\","]
+#[doc = "        \"null\""]
+#[doc = "      ]"]
+#[doc = "    },"]
+#[doc = "    \"sort\": {"]
+#[doc = "      \"type\": \"array\","]
+#[doc = "      \"items\": {"]
+#[doc = "        \"$ref\": \"#/$defs/AgentViewSort\""]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    \"source\": {"]
+#[doc = "      \"type\": \"string\""]
+#[doc = "    }"]
+#[doc = "  }"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+pub struct AgentViewSetParams {
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub filter: ::std::option::Option<AgentViewFilter>,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub label: ::std::option::Option<::std::string::String>,
+    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    pub sort: ::std::vec::Vec<AgentViewSort>,
+    pub source: ::std::string::String,
+}
+impl AgentViewSetParams {
+    pub fn builder() -> builder::AgentViewSetParams {
+        Default::default()
+    }
+}
+#[doc = "`AgentViewSort`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"object\","]
+#[doc = "  \"required\": ["]
+#[doc = "    \"field\""]
+#[doc = "  ],"]
+#[doc = "  \"properties\": {"]
+#[doc = "    \"field\": {"]
+#[doc = "      \"$ref\": \"#/$defs/AgentViewSortField\""]
+#[doc = "    },"]
+#[doc = "    \"order\": {"]
+#[doc = "      \"default\": \"asc\","]
+#[doc = "      \"$ref\": \"#/$defs/AgentViewSortOrder\""]
+#[doc = "    }"]
+#[doc = "  }"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+pub struct AgentViewSort {
+    pub field: AgentViewSortField,
+    #[serde(default = "defaults::agent_view_sort_order")]
+    pub order: AgentViewSortOrder,
+}
+impl AgentViewSort {
+    pub fn builder() -> builder::AgentViewSort {
+        Default::default()
+    }
+}
+#[doc = "`AgentViewSortField`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"anyOf\": ["]
+#[doc = "    {"]
+#[doc = "      \"$ref\": \"#/$defs/AgentViewBuiltinSortField\""]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"token\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"token\": {"]
+#[doc = "          \"type\": \"string\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    }"]
+#[doc = "  ]"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+#[serde(untagged)]
+pub enum AgentViewSortField {
+    AgentViewBuiltinSortField(AgentViewBuiltinSortField),
+    Object { token: ::std::string::String },
+}
+impl ::std::convert::From<AgentViewBuiltinSortField> for AgentViewSortField {
+    fn from(value: AgentViewBuiltinSortField) -> Self {
+        Self::AgentViewBuiltinSortField(value)
+    }
+}
+#[doc = "`AgentViewSortOrder`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"string\","]
+#[doc = "  \"enum\": ["]
+#[doc = "    \"asc\","]
+#[doc = "    \"desc\""]
+#[doc = "  ]"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(
+    :: serde :: Deserialize,
+    :: serde :: Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd,
+)]
+pub enum AgentViewSortOrder {
+    #[serde(rename = "asc")]
+    Asc,
+    #[serde(rename = "desc")]
+    Desc,
+}
+impl ::std::fmt::Display for AgentViewSortOrder {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Asc => f.write_str("asc"),
+            Self::Desc => f.write_str("desc"),
+        }
+    }
+}
+impl ::std::str::FromStr for AgentViewSortOrder {
+    type Err = self::error::ConversionError;
+    fn from_str(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "asc" => Ok(Self::Asc),
+            "desc" => Ok(Self::Desc),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for AgentViewSortOrder {
+    type Error = self::error::ConversionError;
+    fn try_from(value: &str) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<&::std::string::String> for AgentViewSortOrder {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for AgentViewSortOrder {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+#[doc = "`AgentViewValue`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"anyOf\": ["]
+#[doc = "    {"]
+#[doc = "      \"type\": \"string\""]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"boolean\""]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"integer\","]
+#[doc = "      \"format\": \"uint64\","]
+#[doc = "      \"minimum\": 0.0"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"context\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"context\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentViewContext\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    }"]
+#[doc = "  ]"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+#[serde(untagged)]
+pub enum AgentViewValue {
+    String(::std::string::String),
+    Boolean(bool),
+    Uint64(u64),
+    Object { context: AgentViewContext },
+}
+impl ::std::convert::From<bool> for AgentViewValue {
+    fn from(value: bool) -> Self {
+        Self::Boolean(value)
+    }
+}
+impl ::std::convert::From<u64> for AgentViewValue {
+    fn from(value: u64) -> Self {
+        Self::Uint64(value)
+    }
+}
+#[doc = "`AgentWaitParams`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"object\","]
+#[doc = "  \"required\": ["]
+#[doc = "    \"target\""]
+#[doc = "  ],"]
+#[doc = "  \"properties\": {"]
+#[doc = "    \"target\": {"]
+#[doc = "      \"type\": \"string\""]
+#[doc = "    },"]
+#[doc = "    \"timeout_ms\": {"]
+#[doc = "      \"type\": ["]
+#[doc = "        \"integer\","]
+#[doc = "        \"null\""]
+#[doc = "      ],"]
+#[doc = "      \"format\": \"uint64\","]
+#[doc = "      \"minimum\": 0.0"]
+#[doc = "    },"]
+#[doc = "    \"until\": {"]
+#[doc = "      \"type\": \"array\","]
+#[doc = "      \"items\": {"]
+#[doc = "        \"$ref\": \"#/$defs/AgentStatus\""]
+#[doc = "      }"]
+#[doc = "    }"]
+#[doc = "  }"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+pub struct AgentWaitParams {
+    pub target: ::std::string::String,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub timeout_ms: ::std::option::Option<u64>,
+    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    pub until: ::std::vec::Vec<AgentStatus>,
+}
+impl AgentWaitParams {
+    pub fn builder() -> builder::AgentWaitParams {
         Default::default()
     }
 }
@@ -5124,10 +5972,10 @@ impl ::std::convert::TryFrom<::std::string::String> for ReadSource {
 #[doc = "      \"properties\": {"]
 #[doc = "        \"method\": {"]
 #[doc = "          \"type\": \"string\","]
-#[doc = "          \"const\": \"agent.send\""]
+#[doc = "          \"const\": \"agent.send_keys\""]
 #[doc = "        },"]
 #[doc = "        \"params\": {"]
-#[doc = "          \"$ref\": \"#/$defs/AgentSendParams\""]
+#[doc = "          \"$ref\": \"#/$defs/AgentSendKeysParams\""]
 #[doc = "        }"]
 #[doc = "      }"]
 #[doc = "    },"]
@@ -5144,6 +5992,38 @@ impl ::std::convert::TryFrom<::std::string::String> for ReadSource {
 #[doc = "        },"]
 #[doc = "        \"params\": {"]
 #[doc = "          \"$ref\": \"#/$defs/AgentRenameParams\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"method\","]
+#[doc = "        \"params\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"method\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"agent.view.set\""]
+#[doc = "        },"]
+#[doc = "        \"params\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentViewSetParams\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"method\","]
+#[doc = "        \"params\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"method\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"agent.view.clear\""]
+#[doc = "        },"]
+#[doc = "        \"params\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentViewClearParams\""]
 #[doc = "        }"]
 #[doc = "      }"]
 #[doc = "    },"]
@@ -5176,6 +6056,38 @@ impl ::std::convert::TryFrom<::std::string::String> for ReadSource {
 #[doc = "        },"]
 #[doc = "        \"params\": {"]
 #[doc = "          \"$ref\": \"#/$defs/AgentStartParams\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"method\","]
+#[doc = "        \"params\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"method\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"agent.prompt\""]
+#[doc = "        },"]
+#[doc = "        \"params\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentPromptParams\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"method\","]
+#[doc = "        \"params\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"method\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"agent.wait\""]
+#[doc = "        },"]
+#[doc = "        \"params\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentWaitParams\""]
 #[doc = "        }"]
 #[doc = "      }"]
 #[doc = "    },"]
@@ -6130,7 +7042,7 @@ pub enum Request {
     Variant33 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: AgentSendParams,
+        params: AgentSendKeysParams,
     },
     Variant34 {
         id: ::std::string::String,
@@ -6140,249 +7052,269 @@ pub enum Request {
     Variant35 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: AgentTarget,
+        params: AgentViewSetParams,
     },
     Variant36 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: AgentStartParams,
+        params: AgentViewClearParams,
     },
     Variant37 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneSplitParams,
+        params: AgentTarget,
     },
     Variant38 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneSwapParams,
+        params: AgentStartParams,
     },
     Variant39 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneMoveParams,
+        params: AgentPromptParams,
     },
     Variant40 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneZoomParams,
+        params: AgentWaitParams,
     },
     Variant41 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneLayoutParams,
+        params: PaneSplitParams,
     },
     Variant42 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneProcessInfoParams,
+        params: PaneSwapParams,
     },
     Variant43 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: LayoutExportParams,
+        params: PaneMoveParams,
     },
     Variant44 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: LayoutApplyParams,
+        params: PaneZoomParams,
     },
     Variant45 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: LayoutSetSplitRatioParams,
+        params: PaneLayoutParams,
     },
     Variant46 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneNeighborParams,
+        params: PaneProcessInfoParams,
     },
     Variant47 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneEdgesParams,
+        params: LayoutExportParams,
     },
     Variant48 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneFocusDirectionParams,
+        params: LayoutApplyParams,
     },
     Variant49 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneResizeParams,
+        params: LayoutSetSplitRatioParams,
     },
     Variant50 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneListParams,
+        params: PaneNeighborParams,
     },
     Variant51 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneCurrentParams,
+        params: PaneEdgesParams,
     },
     Variant52 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneTarget,
+        params: PaneFocusDirectionParams,
     },
     Variant53 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneTarget,
+        params: PaneResizeParams,
     },
     Variant54 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneRenameParams,
+        params: PaneListParams,
     },
     Variant55 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneSendTextParams,
+        params: PaneCurrentParams,
     },
     Variant56 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneSendKeysParams,
+        params: PaneTarget,
     },
     Variant57 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneSendInputParams,
+        params: PaneTarget,
     },
     Variant58 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneReadParams,
+        params: PaneRenameParams,
     },
     Variant59 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneGraphicsSetParams,
+        params: PaneSendTextParams,
     },
     Variant60 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneGraphicsClearParams,
+        params: PaneSendKeysParams,
     },
     Variant61 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneTarget,
+        params: PaneSendInputParams,
     },
     Variant62 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneReportAgentParams,
+        params: PaneReadParams,
     },
     Variant63 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneReportAgentSessionParams,
+        params: PaneGraphicsSetParams,
     },
     Variant64 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneReportMetadataParams,
+        params: PaneGraphicsClearParams,
     },
     Variant65 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneClearAgentAuthorityParams,
+        params: PaneTarget,
     },
     Variant66 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneReleaseAgentParams,
+        params: PaneReportAgentParams,
     },
     Variant67 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneTarget,
+        params: PaneReportAgentSessionParams,
     },
     Variant68 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: EmptyParams,
+        params: PaneReportMetadataParams,
     },
     Variant69 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: EventsSubscribeParams,
+        params: PaneClearAgentAuthorityParams,
     },
     Variant70 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: EventsWaitParams,
+        params: PaneReleaseAgentParams,
     },
     Variant71 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PaneWaitForOutputParams,
+        params: PaneTarget,
     },
     Variant72 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: IntegrationInstallParams,
+        params: EmptyParams,
     },
     Variant73 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: IntegrationUninstallParams,
+        params: EventsSubscribeParams,
     },
     Variant74 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginLinkParams,
+        params: EventsWaitParams,
     },
     Variant75 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginListParams,
+        params: PaneWaitForOutputParams,
     },
     Variant76 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginUnlinkParams,
+        params: IntegrationInstallParams,
     },
     Variant77 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginSetEnabledParams,
+        params: IntegrationUninstallParams,
     },
     Variant78 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginSetEnabledParams,
+        params: PluginLinkParams,
     },
     Variant79 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginActionListParams,
+        params: PluginListParams,
     },
     Variant80 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginActionInvokeParams,
+        params: PluginUnlinkParams,
     },
     Variant81 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginLogListParams,
+        params: PluginSetEnabledParams,
     },
     Variant82 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginPaneOpenParams,
+        params: PluginSetEnabledParams,
     },
     Variant83 {
         id: ::std::string::String,
         method: ::std::string::String,
-        params: PluginPaneFocusParams,
+        params: PluginActionListParams,
     },
     Variant84 {
+        id: ::std::string::String,
+        method: ::std::string::String,
+        params: PluginActionInvokeParams,
+    },
+    Variant85 {
+        id: ::std::string::String,
+        method: ::std::string::String,
+        params: PluginLogListParams,
+    },
+    Variant86 {
+        id: ::std::string::String,
+        method: ::std::string::String,
+        params: PluginPaneOpenParams,
+    },
+    Variant87 {
+        id: ::std::string::String,
+        method: ::std::string::String,
+        params: PluginPaneFocusParams,
+    },
+    Variant88 {
         id: ::std::string::String,
         method: ::std::string::String,
         params: PluginPaneCloseParams,
@@ -7820,6 +8752,131 @@ impl WorktreeRemoveParams {
 #[doc = r" Types for composing complex structures."]
 pub mod builder {
     #[derive(Clone, Debug)]
+    pub struct AgentPromptParams {
+        target: ::std::result::Result<::std::string::String, ::std::string::String>,
+        text: ::std::result::Result<::std::string::String, ::std::string::String>,
+        wait: ::std::result::Result<
+            ::std::option::Option<super::AgentPromptWaitOptions>,
+            ::std::string::String,
+        >,
+    }
+    impl ::std::default::Default for AgentPromptParams {
+        fn default() -> Self {
+            Self {
+                target: Err("no value supplied for target".to_string()),
+                text: Err("no value supplied for text".to_string()),
+                wait: Ok(Default::default()),
+            }
+        }
+    }
+    impl AgentPromptParams {
+        pub fn target<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::string::String>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.target = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for target: {e}"));
+            self
+        }
+        pub fn text<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::string::String>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.text = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for text: {e}"));
+            self
+        }
+        pub fn wait<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::option::Option<super::AgentPromptWaitOptions>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.wait = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for wait: {e}"));
+            self
+        }
+    }
+    impl ::std::convert::TryFrom<AgentPromptParams> for super::AgentPromptParams {
+        type Error = super::error::ConversionError;
+        fn try_from(
+            value: AgentPromptParams,
+        ) -> ::std::result::Result<Self, super::error::ConversionError> {
+            Ok(Self {
+                target: value.target?,
+                text: value.text?,
+                wait: value.wait?,
+            })
+        }
+    }
+    impl ::std::convert::From<super::AgentPromptParams> for AgentPromptParams {
+        fn from(value: super::AgentPromptParams) -> Self {
+            Self {
+                target: Ok(value.target),
+                text: Ok(value.text),
+                wait: Ok(value.wait),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
+    pub struct AgentPromptWaitOptions {
+        timeout_ms: ::std::result::Result<::std::option::Option<u64>, ::std::string::String>,
+        until: ::std::result::Result<::std::vec::Vec<super::AgentStatus>, ::std::string::String>,
+    }
+    impl ::std::default::Default for AgentPromptWaitOptions {
+        fn default() -> Self {
+            Self {
+                timeout_ms: Ok(Default::default()),
+                until: Ok(Default::default()),
+            }
+        }
+    }
+    impl AgentPromptWaitOptions {
+        pub fn timeout_ms<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::option::Option<u64>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.timeout_ms = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for timeout_ms: {e}"));
+            self
+        }
+        pub fn until<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::vec::Vec<super::AgentStatus>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.until = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for until: {e}"));
+            self
+        }
+    }
+    impl ::std::convert::TryFrom<AgentPromptWaitOptions> for super::AgentPromptWaitOptions {
+        type Error = super::error::ConversionError;
+        fn try_from(
+            value: AgentPromptWaitOptions,
+        ) -> ::std::result::Result<Self, super::error::ConversionError> {
+            Ok(Self {
+                timeout_ms: value.timeout_ms?,
+                until: value.until?,
+            })
+        }
+    }
+    impl ::std::convert::From<super::AgentPromptWaitOptions> for AgentPromptWaitOptions {
+        fn from(value: super::AgentPromptWaitOptions) -> Self {
+            Self {
+                timeout_ms: Ok(value.timeout_ms),
+                until: Ok(value.until),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
     pub struct AgentReadParams {
         format: ::std::result::Result<super::ReadFormat, ::std::string::String>,
         lines: ::std::result::Result<::std::option::Option<u32>, ::std::string::String>,
@@ -7973,19 +9030,29 @@ pub mod builder {
         }
     }
     #[derive(Clone, Debug)]
-    pub struct AgentSendParams {
+    pub struct AgentSendKeysParams {
+        keys: ::std::result::Result<::std::vec::Vec<::std::string::String>, ::std::string::String>,
         target: ::std::result::Result<::std::string::String, ::std::string::String>,
-        text: ::std::result::Result<::std::string::String, ::std::string::String>,
     }
-    impl ::std::default::Default for AgentSendParams {
+    impl ::std::default::Default for AgentSendKeysParams {
         fn default() -> Self {
             Self {
+                keys: Err("no value supplied for keys".to_string()),
                 target: Err("no value supplied for target".to_string()),
-                text: Err("no value supplied for text".to_string()),
             }
         }
     }
-    impl AgentSendParams {
+    impl AgentSendKeysParams {
+        pub fn keys<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::vec::Vec<::std::string::String>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.keys = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for keys: {e}"));
+            self
+        }
         pub fn target<T>(mut self, value: T) -> Self
         where
             T: ::std::convert::TryInto<::std::string::String>,
@@ -7996,117 +9063,64 @@ pub mod builder {
                 .map_err(|e| format!("error converting supplied value for target: {e}"));
             self
         }
-        pub fn text<T>(mut self, value: T) -> Self
-        where
-            T: ::std::convert::TryInto<::std::string::String>,
-            T::Error: ::std::fmt::Display,
-        {
-            self.text = value
-                .try_into()
-                .map_err(|e| format!("error converting supplied value for text: {e}"));
-            self
-        }
     }
-    impl ::std::convert::TryFrom<AgentSendParams> for super::AgentSendParams {
+    impl ::std::convert::TryFrom<AgentSendKeysParams> for super::AgentSendKeysParams {
         type Error = super::error::ConversionError;
         fn try_from(
-            value: AgentSendParams,
+            value: AgentSendKeysParams,
         ) -> ::std::result::Result<Self, super::error::ConversionError> {
             Ok(Self {
+                keys: value.keys?,
                 target: value.target?,
-                text: value.text?,
             })
         }
     }
-    impl ::std::convert::From<super::AgentSendParams> for AgentSendParams {
-        fn from(value: super::AgentSendParams) -> Self {
+    impl ::std::convert::From<super::AgentSendKeysParams> for AgentSendKeysParams {
+        fn from(value: super::AgentSendKeysParams) -> Self {
             Self {
+                keys: Ok(value.keys),
                 target: Ok(value.target),
-                text: Ok(value.text),
             }
         }
     }
     #[derive(Clone, Debug)]
     pub struct AgentStartParams {
-        argv: ::std::result::Result<::std::vec::Vec<::std::string::String>, ::std::string::String>,
-        cwd: ::std::result::Result<
-            ::std::option::Option<::std::string::String>,
-            ::std::string::String,
-        >,
-        env: ::std::result::Result<
-            ::std::collections::HashMap<::std::string::String, ::std::string::String>,
-            ::std::string::String,
-        >,
-        focus: ::std::result::Result<bool, ::std::string::String>,
+        args: ::std::result::Result<::std::vec::Vec<::std::string::String>, ::std::string::String>,
+        kind: ::std::result::Result<::std::string::String, ::std::string::String>,
         name: ::std::result::Result<::std::string::String, ::std::string::String>,
-        split: ::std::result::Result<
-            ::std::option::Option<super::SplitDirection>,
-            ::std::string::String,
-        >,
-        tab_id: ::std::result::Result<
-            ::std::option::Option<::std::string::String>,
-            ::std::string::String,
-        >,
-        workspace_id: ::std::result::Result<
-            ::std::option::Option<::std::string::String>,
-            ::std::string::String,
-        >,
+        pane_id: ::std::result::Result<::std::string::String, ::std::string::String>,
+        timeout_ms: ::std::result::Result<::std::option::Option<u64>, ::std::string::String>,
     }
     impl ::std::default::Default for AgentStartParams {
         fn default() -> Self {
             Self {
-                argv: Err("no value supplied for argv".to_string()),
-                cwd: Ok(Default::default()),
-                env: Ok(Default::default()),
-                focus: Ok(Default::default()),
+                args: Ok(Default::default()),
+                kind: Err("no value supplied for kind".to_string()),
                 name: Err("no value supplied for name".to_string()),
-                split: Ok(Default::default()),
-                tab_id: Ok(Default::default()),
-                workspace_id: Ok(Default::default()),
+                pane_id: Err("no value supplied for pane_id".to_string()),
+                timeout_ms: Ok(Default::default()),
             }
         }
     }
     impl AgentStartParams {
-        pub fn argv<T>(mut self, value: T) -> Self
+        pub fn args<T>(mut self, value: T) -> Self
         where
             T: ::std::convert::TryInto<::std::vec::Vec<::std::string::String>>,
             T::Error: ::std::fmt::Display,
         {
-            self.argv = value
+            self.args = value
                 .try_into()
-                .map_err(|e| format!("error converting supplied value for argv: {e}"));
+                .map_err(|e| format!("error converting supplied value for args: {e}"));
             self
         }
-        pub fn cwd<T>(mut self, value: T) -> Self
+        pub fn kind<T>(mut self, value: T) -> Self
         where
-            T: ::std::convert::TryInto<::std::option::Option<::std::string::String>>,
+            T: ::std::convert::TryInto<::std::string::String>,
             T::Error: ::std::fmt::Display,
         {
-            self.cwd = value
+            self.kind = value
                 .try_into()
-                .map_err(|e| format!("error converting supplied value for cwd: {e}"));
-            self
-        }
-        pub fn env<T>(mut self, value: T) -> Self
-        where
-            T: ::std::convert::TryInto<
-                ::std::collections::HashMap<::std::string::String, ::std::string::String>,
-            >,
-            T::Error: ::std::fmt::Display,
-        {
-            self.env = value
-                .try_into()
-                .map_err(|e| format!("error converting supplied value for env: {e}"));
-            self
-        }
-        pub fn focus<T>(mut self, value: T) -> Self
-        where
-            T: ::std::convert::TryInto<bool>,
-            T::Error: ::std::fmt::Display,
-        {
-            self.focus = value
-                .try_into()
-                .map_err(|e| format!("error converting supplied value for focus: {e}"));
+                .map_err(|e| format!("error converting supplied value for kind: {e}"));
             self
         }
         pub fn name<T>(mut self, value: T) -> Self
@@ -8119,34 +9133,24 @@ pub mod builder {
                 .map_err(|e| format!("error converting supplied value for name: {e}"));
             self
         }
-        pub fn split<T>(mut self, value: T) -> Self
+        pub fn pane_id<T>(mut self, value: T) -> Self
         where
-            T: ::std::convert::TryInto<::std::option::Option<super::SplitDirection>>,
+            T: ::std::convert::TryInto<::std::string::String>,
             T::Error: ::std::fmt::Display,
         {
-            self.split = value
+            self.pane_id = value
                 .try_into()
-                .map_err(|e| format!("error converting supplied value for split: {e}"));
+                .map_err(|e| format!("error converting supplied value for pane_id: {e}"));
             self
         }
-        pub fn tab_id<T>(mut self, value: T) -> Self
+        pub fn timeout_ms<T>(mut self, value: T) -> Self
         where
-            T: ::std::convert::TryInto<::std::option::Option<::std::string::String>>,
+            T: ::std::convert::TryInto<::std::option::Option<u64>>,
             T::Error: ::std::fmt::Display,
         {
-            self.tab_id = value
+            self.timeout_ms = value
                 .try_into()
-                .map_err(|e| format!("error converting supplied value for tab_id: {e}"));
-            self
-        }
-        pub fn workspace_id<T>(mut self, value: T) -> Self
-        where
-            T: ::std::convert::TryInto<::std::option::Option<::std::string::String>>,
-            T::Error: ::std::fmt::Display,
-        {
-            self.workspace_id = value
-                .try_into()
-                .map_err(|e| format!("error converting supplied value for workspace_id: {e}"));
+                .map_err(|e| format!("error converting supplied value for timeout_ms: {e}"));
             self
         }
     }
@@ -8156,28 +9160,22 @@ pub mod builder {
             value: AgentStartParams,
         ) -> ::std::result::Result<Self, super::error::ConversionError> {
             Ok(Self {
-                argv: value.argv?,
-                cwd: value.cwd?,
-                env: value.env?,
-                focus: value.focus?,
+                args: value.args?,
+                kind: value.kind?,
                 name: value.name?,
-                split: value.split?,
-                tab_id: value.tab_id?,
-                workspace_id: value.workspace_id?,
+                pane_id: value.pane_id?,
+                timeout_ms: value.timeout_ms?,
             })
         }
     }
     impl ::std::convert::From<super::AgentStartParams> for AgentStartParams {
         fn from(value: super::AgentStartParams) -> Self {
             Self {
-                argv: Ok(value.argv),
-                cwd: Ok(value.cwd),
-                env: Ok(value.env),
-                focus: Ok(value.focus),
+                args: Ok(value.args),
+                kind: Ok(value.kind),
                 name: Ok(value.name),
-                split: Ok(value.split),
-                tab_id: Ok(value.tab_id),
-                workspace_id: Ok(value.workspace_id),
+                pane_id: Ok(value.pane_id),
+                timeout_ms: Ok(value.timeout_ms),
             }
         }
     }
@@ -8218,6 +9216,259 @@ pub mod builder {
         fn from(value: super::AgentTarget) -> Self {
             Self {
                 target: Ok(value.target),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
+    pub struct AgentViewClearParams {
+        source: ::std::result::Result<
+            ::std::option::Option<::std::string::String>,
+            ::std::string::String,
+        >,
+    }
+    impl ::std::default::Default for AgentViewClearParams {
+        fn default() -> Self {
+            Self {
+                source: Ok(Default::default()),
+            }
+        }
+    }
+    impl AgentViewClearParams {
+        pub fn source<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::option::Option<::std::string::String>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.source = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for source: {e}"));
+            self
+        }
+    }
+    impl ::std::convert::TryFrom<AgentViewClearParams> for super::AgentViewClearParams {
+        type Error = super::error::ConversionError;
+        fn try_from(
+            value: AgentViewClearParams,
+        ) -> ::std::result::Result<Self, super::error::ConversionError> {
+            Ok(Self {
+                source: value.source?,
+            })
+        }
+    }
+    impl ::std::convert::From<super::AgentViewClearParams> for AgentViewClearParams {
+        fn from(value: super::AgentViewClearParams) -> Self {
+            Self {
+                source: Ok(value.source),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
+    pub struct AgentViewSetParams {
+        filter: ::std::result::Result<
+            ::std::option::Option<super::AgentViewFilter>,
+            ::std::string::String,
+        >,
+        label: ::std::result::Result<
+            ::std::option::Option<::std::string::String>,
+            ::std::string::String,
+        >,
+        sort: ::std::result::Result<::std::vec::Vec<super::AgentViewSort>, ::std::string::String>,
+        source: ::std::result::Result<::std::string::String, ::std::string::String>,
+    }
+    impl ::std::default::Default for AgentViewSetParams {
+        fn default() -> Self {
+            Self {
+                filter: Ok(Default::default()),
+                label: Ok(Default::default()),
+                sort: Ok(Default::default()),
+                source: Err("no value supplied for source".to_string()),
+            }
+        }
+    }
+    impl AgentViewSetParams {
+        pub fn filter<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::option::Option<super::AgentViewFilter>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.filter = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for filter: {e}"));
+            self
+        }
+        pub fn label<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::option::Option<::std::string::String>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.label = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for label: {e}"));
+            self
+        }
+        pub fn sort<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::vec::Vec<super::AgentViewSort>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.sort = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for sort: {e}"));
+            self
+        }
+        pub fn source<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::string::String>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.source = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for source: {e}"));
+            self
+        }
+    }
+    impl ::std::convert::TryFrom<AgentViewSetParams> for super::AgentViewSetParams {
+        type Error = super::error::ConversionError;
+        fn try_from(
+            value: AgentViewSetParams,
+        ) -> ::std::result::Result<Self, super::error::ConversionError> {
+            Ok(Self {
+                filter: value.filter?,
+                label: value.label?,
+                sort: value.sort?,
+                source: value.source?,
+            })
+        }
+    }
+    impl ::std::convert::From<super::AgentViewSetParams> for AgentViewSetParams {
+        fn from(value: super::AgentViewSetParams) -> Self {
+            Self {
+                filter: Ok(value.filter),
+                label: Ok(value.label),
+                sort: Ok(value.sort),
+                source: Ok(value.source),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
+    pub struct AgentViewSort {
+        field: ::std::result::Result<super::AgentViewSortField, ::std::string::String>,
+        order: ::std::result::Result<super::AgentViewSortOrder, ::std::string::String>,
+    }
+    impl ::std::default::Default for AgentViewSort {
+        fn default() -> Self {
+            Self {
+                field: Err("no value supplied for field".to_string()),
+                order: Ok(super::defaults::agent_view_sort_order()),
+            }
+        }
+    }
+    impl AgentViewSort {
+        pub fn field<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<super::AgentViewSortField>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.field = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for field: {e}"));
+            self
+        }
+        pub fn order<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<super::AgentViewSortOrder>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.order = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for order: {e}"));
+            self
+        }
+    }
+    impl ::std::convert::TryFrom<AgentViewSort> for super::AgentViewSort {
+        type Error = super::error::ConversionError;
+        fn try_from(
+            value: AgentViewSort,
+        ) -> ::std::result::Result<Self, super::error::ConversionError> {
+            Ok(Self {
+                field: value.field?,
+                order: value.order?,
+            })
+        }
+    }
+    impl ::std::convert::From<super::AgentViewSort> for AgentViewSort {
+        fn from(value: super::AgentViewSort) -> Self {
+            Self {
+                field: Ok(value.field),
+                order: Ok(value.order),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
+    pub struct AgentWaitParams {
+        target: ::std::result::Result<::std::string::String, ::std::string::String>,
+        timeout_ms: ::std::result::Result<::std::option::Option<u64>, ::std::string::String>,
+        until: ::std::result::Result<::std::vec::Vec<super::AgentStatus>, ::std::string::String>,
+    }
+    impl ::std::default::Default for AgentWaitParams {
+        fn default() -> Self {
+            Self {
+                target: Err("no value supplied for target".to_string()),
+                timeout_ms: Ok(Default::default()),
+                until: Ok(Default::default()),
+            }
+        }
+    }
+    impl AgentWaitParams {
+        pub fn target<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::string::String>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.target = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for target: {e}"));
+            self
+        }
+        pub fn timeout_ms<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::option::Option<u64>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.timeout_ms = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for timeout_ms: {e}"));
+            self
+        }
+        pub fn until<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::vec::Vec<super::AgentStatus>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.until = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for until: {e}"));
+            self
+        }
+    }
+    impl ::std::convert::TryFrom<AgentWaitParams> for super::AgentWaitParams {
+        type Error = super::error::ConversionError;
+        fn try_from(
+            value: AgentWaitParams,
+        ) -> ::std::result::Result<Self, super::error::ConversionError> {
+            Ok(Self {
+                target: value.target?,
+                timeout_ms: value.timeout_ms?,
+                until: value.until?,
+            })
+        }
+    }
+    impl ::std::convert::From<super::AgentWaitParams> for AgentWaitParams {
+        fn from(value: super::AgentWaitParams) -> Self {
+            Self {
+                target: Ok(value.target),
+                timeout_ms: Ok(value.timeout_ms),
+                until: Ok(value.until),
             }
         }
     }
@@ -13223,6 +14474,9 @@ pub mod defaults {
     }
     pub(super) fn agent_read_params_format() -> super::ReadFormat {
         super::ReadFormat::Text
+    }
+    pub(super) fn agent_view_sort_order() -> super::AgentViewSortOrder {
+        super::AgentViewSortOrder::Asc
     }
     pub(super) fn pane_graphics_set_params_placement() -> super::PaneGraphicsPlacementParams {
         super::PaneGraphicsPlacementParams {

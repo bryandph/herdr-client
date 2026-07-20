@@ -86,6 +86,12 @@ pub mod error {
 #[doc = "        \"null\""]
 #[doc = "      ]"]
 #[doc = "    },"]
+#[doc = "    \"interactive_ready\": {"]
+#[doc = "      \"type\": \"boolean\""]
+#[doc = "    },"]
+#[doc = "    \"launch_pending\": {"]
+#[doc = "      \"type\": \"boolean\""]
+#[doc = "    },"]
 #[doc = "    \"name\": {"]
 #[doc = "      \"type\": ["]
 #[doc = "        \"string\","]
@@ -102,6 +108,12 @@ pub mod error {
 #[doc = "    },"]
 #[doc = "    \"screen_detection_skipped\": {"]
 #[doc = "      \"type\": \"boolean\""]
+#[doc = "    },"]
+#[doc = "    \"state_change_seq\": {"]
+#[doc = "      \"default\": 0,"]
+#[doc = "      \"type\": \"integer\","]
+#[doc = "      \"format\": \"uint64\","]
+#[doc = "      \"minimum\": 0.0"]
 #[doc = "    },"]
 #[doc = "    \"state_labels\": {"]
 #[doc = "      \"type\": \"object\","]
@@ -165,11 +177,17 @@ pub struct AgentInfo {
     #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
     pub foreground_cwd: ::std::option::Option<::std::string::String>,
     #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub interactive_ready: ::std::option::Option<bool>,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub launch_pending: ::std::option::Option<bool>,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
     pub name: ::std::option::Option<::std::string::String>,
     pub pane_id: ::std::string::String,
     pub revision: u64,
     #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
     pub screen_detection_skipped: ::std::option::Option<bool>,
+    #[serde(default)]
+    pub state_change_seq: u64,
     #[serde(
         default,
         skip_serializing_if = ":: std :: collections :: HashMap::is_empty"
@@ -1241,8 +1259,21 @@ impl ::std::convert::TryFrom<::std::string::String> for ConfigReloadStatus {
 #[doc = "            \"null\""]
 #[doc = "          ]"]
 #[doc = "        },"]
+#[doc = "        \"final_status\": {"]
+#[doc = "          \"anyOf\": ["]
+#[doc = "            {"]
+#[doc = "              \"$ref\": \"#/$defs/AgentStatus\""]
+#[doc = "            },"]
+#[doc = "            {"]
+#[doc = "              \"type\": \"null\""]
+#[doc = "            }"]
+#[doc = "          ]"]
+#[doc = "        },"]
 #[doc = "        \"pane_id\": {"]
 #[doc = "          \"type\": \"string\""]
+#[doc = "        },"]
+#[doc = "        \"released\": {"]
+#[doc = "          \"type\": \"boolean\""]
 #[doc = "        },"]
 #[doc = "        \"type\": {"]
 #[doc = "          \"type\": \"string\","]
@@ -1437,7 +1468,11 @@ pub enum EventData {
     PaneAgentDetected {
         #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
         agent: ::std::option::Option<::std::string::String>,
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        final_status: ::std::option::Option<AgentStatus>,
         pane_id: ::std::string::String,
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        released: ::std::option::Option<bool>,
         workspace_id: ::std::string::String,
     },
     #[serde(rename = "pane_agent_status_changed")]
@@ -1765,6 +1800,12 @@ impl ::std::convert::TryFrom<::std::string::String> for EventKind {
 #[doc = "      },"]
 #[doc = "      \"$ref\": \"#/$defs/PluginSourceInfo\""]
 #[doc = "    },"]
+#[doc = "    \"startup\": {"]
+#[doc = "      \"type\": \"array\","]
+#[doc = "      \"items\": {"]
+#[doc = "        \"$ref\": \"#/$defs/PluginManifestStartup\""]
+#[doc = "      }"]
+#[doc = "    },"]
 #[doc = "    \"version\": {"]
 #[doc = "      \"type\": \"string\""]
 #[doc = "    },"]
@@ -1804,6 +1845,8 @@ pub struct InstalledPluginInfo {
     pub plugin_root: ::std::string::String,
     #[serde(default = "defaults::installed_plugin_info_source")]
     pub source: PluginSourceInfo,
+    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    pub startup: ::std::vec::Vec<PluginManifestStartup>,
     pub version: ::std::string::String,
     #[doc = "Warnings collected at link time or on registry load (e.g. unknown event names,\nmissing manifest file). Non-fatal — the entry is kept and surfaced by plugin.list."]
     #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
@@ -4650,6 +4693,47 @@ impl PluginManifestPane {
         Default::default()
     }
 }
+#[doc = "`PluginManifestStartup`"]
+#[doc = r""]
+#[doc = r" <details><summary>JSON schema</summary>"]
+#[doc = r""]
+#[doc = r" ```json"]
+#[doc = "{"]
+#[doc = "  \"type\": \"object\","]
+#[doc = "  \"required\": ["]
+#[doc = "    \"command\""]
+#[doc = "  ],"]
+#[doc = "  \"properties\": {"]
+#[doc = "    \"command\": {"]
+#[doc = "      \"type\": \"array\","]
+#[doc = "      \"items\": {"]
+#[doc = "        \"type\": \"string\""]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    \"platforms\": {"]
+#[doc = "      \"type\": ["]
+#[doc = "        \"array\","]
+#[doc = "        \"null\""]
+#[doc = "      ],"]
+#[doc = "      \"items\": {"]
+#[doc = "        \"$ref\": \"#/$defs/PluginPlatform\""]
+#[doc = "      }"]
+#[doc = "    }"]
+#[doc = "  }"]
+#[doc = "}"]
+#[doc = r" ```"]
+#[doc = r" </details>"]
+#[derive(:: serde :: Deserialize, :: serde :: Serialize, Clone, Debug, PartialEq)]
+pub struct PluginManifestStartup {
+    pub command: ::std::vec::Vec<::std::string::String>,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub platforms: ::std::option::Option<::std::vec::Vec<PluginPlatform>>,
+}
+impl PluginManifestStartup {
+    pub fn builder() -> builder::PluginManifestStartup {
+        Default::default()
+    }
+}
 #[doc = "`PluginPaneInfo`"]
 #[doc = r""]
 #[doc = r" <details><summary>JSON schema</summary>"]
@@ -5645,6 +5729,22 @@ impl ::std::convert::TryFrom<::std::string::String> for ReadSource {
 #[doc = "    {"]
 #[doc = "      \"type\": \"object\","]
 #[doc = "      \"required\": ["]
+#[doc = "        \"agent\","]
+#[doc = "        \"type\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"agent\": {"]
+#[doc = "          \"$ref\": \"#/$defs/AgentInfo\""]
+#[doc = "        },"]
+#[doc = "        \"type\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"agent_prompted\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
 #[doc = "        \"agents\","]
 #[doc = "        \"type\""]
 #[doc = "      ],"]
@@ -5658,6 +5758,34 @@ impl ::std::convert::TryFrom<::std::string::String> for ReadSource {
 #[doc = "        \"type\": {"]
 #[doc = "          \"type\": \"string\","]
 #[doc = "          \"const\": \"agent_list\""]
+#[doc = "        }"]
+#[doc = "      }"]
+#[doc = "    },"]
+#[doc = "    {"]
+#[doc = "      \"type\": \"object\","]
+#[doc = "      \"required\": ["]
+#[doc = "        \"active\","]
+#[doc = "        \"type\""]
+#[doc = "      ],"]
+#[doc = "      \"properties\": {"]
+#[doc = "        \"active\": {"]
+#[doc = "          \"type\": \"boolean\""]
+#[doc = "        },"]
+#[doc = "        \"label\": {"]
+#[doc = "          \"type\": ["]
+#[doc = "            \"string\","]
+#[doc = "            \"null\""]
+#[doc = "          ]"]
+#[doc = "        },"]
+#[doc = "        \"source\": {"]
+#[doc = "          \"type\": ["]
+#[doc = "            \"string\","]
+#[doc = "            \"null\""]
+#[doc = "          ]"]
+#[doc = "        },"]
+#[doc = "        \"type\": {"]
+#[doc = "          \"type\": \"string\","]
+#[doc = "          \"const\": \"agent_view\""]
 #[doc = "        }"]
 #[doc = "      }"]
 #[doc = "    },"]
@@ -6449,8 +6577,18 @@ pub enum ResponseResult {
         agent: AgentInfo,
         argv: ::std::vec::Vec<::std::string::String>,
     },
+    #[serde(rename = "agent_prompted")]
+    AgentPrompted { agent: AgentInfo },
     #[serde(rename = "agent_list")]
     AgentList { agents: ::std::vec::Vec<AgentInfo> },
+    #[serde(rename = "agent_view")]
+    AgentView {
+        active: bool,
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        label: ::std::option::Option<::std::string::String>,
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        source: ::std::option::Option<::std::string::String>,
+    },
     #[serde(rename = "pane_info")]
     PaneInfo { pane: PaneInfo },
     #[serde(rename = "pane_list")]
@@ -7230,6 +7368,9 @@ pub mod builder {
             ::std::option::Option<::std::string::String>,
             ::std::string::String,
         >,
+        interactive_ready:
+            ::std::result::Result<::std::option::Option<bool>, ::std::string::String>,
+        launch_pending: ::std::result::Result<::std::option::Option<bool>, ::std::string::String>,
         name: ::std::result::Result<
             ::std::option::Option<::std::string::String>,
             ::std::string::String,
@@ -7238,6 +7379,7 @@ pub mod builder {
         revision: ::std::result::Result<u64, ::std::string::String>,
         screen_detection_skipped:
             ::std::result::Result<::std::option::Option<bool>, ::std::string::String>,
+        state_change_seq: ::std::result::Result<u64, ::std::string::String>,
         state_labels: ::std::result::Result<
             ::std::collections::HashMap<::std::string::String, ::std::string::String>,
             ::std::string::String,
@@ -7272,10 +7414,13 @@ pub mod builder {
                 display_agent: Ok(Default::default()),
                 focused: Err("no value supplied for focused".to_string()),
                 foreground_cwd: Ok(Default::default()),
+                interactive_ready: Ok(Default::default()),
+                launch_pending: Ok(Default::default()),
                 name: Ok(Default::default()),
                 pane_id: Err("no value supplied for pane_id".to_string()),
                 revision: Err("no value supplied for revision".to_string()),
                 screen_detection_skipped: Ok(Default::default()),
+                state_change_seq: Ok(Default::default()),
                 state_labels: Ok(Default::default()),
                 tab_id: Err("no value supplied for tab_id".to_string()),
                 terminal_id: Err("no value supplied for terminal_id".to_string()),
@@ -7358,6 +7503,26 @@ pub mod builder {
                 .map_err(|e| format!("error converting supplied value for foreground_cwd: {e}"));
             self
         }
+        pub fn interactive_ready<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::option::Option<bool>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.interactive_ready = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for interactive_ready: {e}"));
+            self
+        }
+        pub fn launch_pending<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::option::Option<bool>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.launch_pending = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for launch_pending: {e}"));
+            self
+        }
         pub fn name<T>(mut self, value: T) -> Self
         where
             T: ::std::convert::TryInto<::std::option::Option<::std::string::String>>,
@@ -7396,6 +7561,16 @@ pub mod builder {
             self.screen_detection_skipped = value.try_into().map_err(|e| {
                 format!("error converting supplied value for screen_detection_skipped: {e}")
             });
+            self
+        }
+        pub fn state_change_seq<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<u64>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.state_change_seq = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for state_change_seq: {e}"));
             self
         }
         pub fn state_labels<T>(mut self, value: T) -> Self
@@ -7496,10 +7671,13 @@ pub mod builder {
                 display_agent: value.display_agent?,
                 focused: value.focused?,
                 foreground_cwd: value.foreground_cwd?,
+                interactive_ready: value.interactive_ready?,
+                launch_pending: value.launch_pending?,
                 name: value.name?,
                 pane_id: value.pane_id?,
                 revision: value.revision?,
                 screen_detection_skipped: value.screen_detection_skipped?,
+                state_change_seq: value.state_change_seq?,
                 state_labels: value.state_labels?,
                 tab_id: value.tab_id?,
                 terminal_id: value.terminal_id?,
@@ -7521,10 +7699,13 @@ pub mod builder {
                 display_agent: Ok(value.display_agent),
                 focused: Ok(value.focused),
                 foreground_cwd: Ok(value.foreground_cwd),
+                interactive_ready: Ok(value.interactive_ready),
+                launch_pending: Ok(value.launch_pending),
                 name: Ok(value.name),
                 pane_id: Ok(value.pane_id),
                 revision: Ok(value.revision),
                 screen_detection_skipped: Ok(value.screen_detection_skipped),
+                state_change_seq: Ok(value.state_change_seq),
                 state_labels: Ok(value.state_labels),
                 tab_id: Ok(value.tab_id),
                 terminal_id: Ok(value.terminal_id),
@@ -7893,6 +8074,10 @@ pub mod builder {
         plugin_id: ::std::result::Result<::std::string::String, ::std::string::String>,
         plugin_root: ::std::result::Result<::std::string::String, ::std::string::String>,
         source: ::std::result::Result<super::PluginSourceInfo, ::std::string::String>,
+        startup: ::std::result::Result<
+            ::std::vec::Vec<super::PluginManifestStartup>,
+            ::std::string::String,
+        >,
         version: ::std::result::Result<::std::string::String, ::std::string::String>,
         warnings:
             ::std::result::Result<::std::vec::Vec<::std::string::String>, ::std::string::String>,
@@ -7914,6 +8099,7 @@ pub mod builder {
                 plugin_id: Err("no value supplied for plugin_id".to_string()),
                 plugin_root: Err("no value supplied for plugin_root".to_string()),
                 source: Ok(super::defaults::installed_plugin_info_source()),
+                startup: Ok(Default::default()),
                 version: Err("no value supplied for version".to_string()),
                 warnings: Ok(Default::default()),
             }
@@ -8062,6 +8248,16 @@ pub mod builder {
                 .map_err(|e| format!("error converting supplied value for source: {e}"));
             self
         }
+        pub fn startup<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::vec::Vec<super::PluginManifestStartup>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.startup = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for startup: {e}"));
+            self
+        }
         pub fn version<T>(mut self, value: T) -> Self
         where
             T: ::std::convert::TryInto<::std::string::String>,
@@ -8103,6 +8299,7 @@ pub mod builder {
                 plugin_id: value.plugin_id?,
                 plugin_root: value.plugin_root?,
                 source: value.source?,
+                startup: value.startup?,
                 version: value.version?,
                 warnings: value.warnings?,
             })
@@ -8125,6 +8322,7 @@ pub mod builder {
                 plugin_id: Ok(value.plugin_id),
                 plugin_root: Ok(value.plugin_root),
                 source: Ok(value.source),
+                startup: Ok(value.startup),
                 version: Ok(value.version),
                 warnings: Ok(value.warnings),
             }
@@ -11437,6 +11635,66 @@ pub mod builder {
                 platforms: Ok(value.platforms),
                 title: Ok(value.title),
                 width: Ok(value.width),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
+    pub struct PluginManifestStartup {
+        command:
+            ::std::result::Result<::std::vec::Vec<::std::string::String>, ::std::string::String>,
+        platforms: ::std::result::Result<
+            ::std::option::Option<::std::vec::Vec<super::PluginPlatform>>,
+            ::std::string::String,
+        >,
+    }
+    impl ::std::default::Default for PluginManifestStartup {
+        fn default() -> Self {
+            Self {
+                command: Err("no value supplied for command".to_string()),
+                platforms: Ok(Default::default()),
+            }
+        }
+    }
+    impl PluginManifestStartup {
+        pub fn command<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<::std::vec::Vec<::std::string::String>>,
+            T::Error: ::std::fmt::Display,
+        {
+            self.command = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for command: {e}"));
+            self
+        }
+        pub fn platforms<T>(mut self, value: T) -> Self
+        where
+            T: ::std::convert::TryInto<
+                ::std::option::Option<::std::vec::Vec<super::PluginPlatform>>,
+            >,
+            T::Error: ::std::fmt::Display,
+        {
+            self.platforms = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for platforms: {e}"));
+            self
+        }
+    }
+    impl ::std::convert::TryFrom<PluginManifestStartup> for super::PluginManifestStartup {
+        type Error = super::error::ConversionError;
+        fn try_from(
+            value: PluginManifestStartup,
+        ) -> ::std::result::Result<Self, super::error::ConversionError> {
+            Ok(Self {
+                command: value.command?,
+                platforms: value.platforms?,
+            })
+        }
+    }
+    impl ::std::convert::From<super::PluginManifestStartup> for PluginManifestStartup {
+        fn from(value: super::PluginManifestStartup) -> Self {
+            Self {
+                command: Ok(value.command),
+                platforms: Ok(value.platforms),
             }
         }
     }

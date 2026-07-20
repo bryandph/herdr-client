@@ -759,8 +759,21 @@ impl ::std::convert::TryFrom<::std::string::String> for AgentStatus {
 #[doc = "            \"null\""]
 #[doc = "          ]"]
 #[doc = "        },"]
+#[doc = "        \"final_status\": {"]
+#[doc = "          \"anyOf\": ["]
+#[doc = "            {"]
+#[doc = "              \"$ref\": \"#/$defs/AgentStatus\""]
+#[doc = "            },"]
+#[doc = "            {"]
+#[doc = "              \"type\": \"null\""]
+#[doc = "            }"]
+#[doc = "          ]"]
+#[doc = "        },"]
 #[doc = "        \"pane_id\": {"]
 #[doc = "          \"type\": \"string\""]
+#[doc = "        },"]
+#[doc = "        \"released\": {"]
+#[doc = "          \"type\": \"boolean\""]
 #[doc = "        },"]
 #[doc = "        \"type\": {"]
 #[doc = "          \"type\": \"string\","]
@@ -955,7 +968,11 @@ pub enum EventData {
     PaneAgentDetected {
         #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
         agent: ::std::option::Option<::std::string::String>,
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        final_status: ::std::option::Option<AgentStatus>,
         pane_id: ::std::string::String,
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        released: ::std::option::Option<bool>,
         workspace_id: ::std::string::String,
     },
     #[serde(rename = "pane_agent_status_changed")]

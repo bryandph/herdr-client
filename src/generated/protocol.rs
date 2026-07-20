@@ -5,7 +5,7 @@
 // herdr server instead of silently mis-decoding.
 
 /// herdr wire protocol version these types were generated against.
-pub const PROTOCOL: u32 = 16;
+pub const PROTOCOL: u32 = 17;
 
 /// Version of herdr's schema *container* format (the `schemas` envelope), not
 /// the wire protocol.
